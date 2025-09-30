@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Mockup Demo</title>
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; font-family:Segoe UI,Tahoma; }
+    body { background:#f5f7f9; padding:20px; color:#333; }
+    .container { max-width:600px; margin:40px auto; background:#fff; padding:20px;
+                 border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,.1); }
+    h1 { color:#2e7d32; text-align:center; margin-bottom:10px; }
+    p { text-align:center; margin-bottom:20px; }
+    label { display:block; margin-bottom:8px; font-weight:600; color:#2e7d32; }
+    select, input[type="file"], textarea {
+      width:100%; padding:12px; border:1px solid #ddd; border-radius:8px;
+      font-size:16px; background:#f9f9f9; margin-bottom:15px;
+    }
+    textarea { resize:vertical; min-height:80px; }
+    button { width:100%; padding:12px; background:#2e7d32; color:#fff; border:none; border-radius:8px;
+             font-weight:bold; cursor:pointer; font-size:16px; transition:background 0.3s; }
+    button:hover { background:#1b5e20; }
+    #preview { margin-top:20px; padding:20px; border:2px dashed #ccc; border-radius:8px;
+              text-align:center; min-height:150px; }
+    .mockup-container { position:relative; display:inline-block; max-width:350px; }
+    .product-image { width:100%; border-radius:8px; }
+    .success-message { background:#e8f5e9; border-left:4px solid #2e7d32; padding:15px;
+                        margin-top:20px; border-radius:4px; display:none; text-align:center; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>AI Mockup Demo</h1>
+    <p>Upload a logo and preview it on a product.</p>
+
+    <label for="product-select">Choose a product:</label>
+     <select id="product-select">
+      <option value="">-- Select --</option>
+      <option value="cup">Coffee Cup</option>
+      <option value="meal_box">Meal Box</option>
+      <option value="napkin">Napkin</option>
+      <option value="paper_bowl">Paper Bowl</option>
+      <option value="bag">Shopping Bag</option>
+      <option value="wrapping papper">Wrapping Paper</option>
+    </select>
+    <label for="logo-upload">Upload a logo:</label>
+    <input id="logo-upload" type="file" accept="image/*">
+
+    <label for="user-prompt">Enter a prompt (optional):</label>
+    <textarea id="user-prompt" placeholder="E.g. Make the mockup look premium with golden lighting..."></textarea>
+
+    <button id="generate-btn">Generate Mockup</button>
+
+    <div id="preview"><em>Preview will appear here…</em></div>
+
+    <div id="success-message" class="success-message">
+      ✅ Mockup generated successfully!
+    </div>
+  </div>
+
+  <script>
+    const backendUrl = window.location.origin;
+    const generateBtn = document.getElementById("generate-btn");
+    const productSelect = document.getElementById("product-select");
+    const logoUpload = document.getElementById("logo-upload");
+    const userPrompt = document.getElementById("user-prompt");
+    const preview = document.getElementById("preview");
+    const successMessage = document.getElementById("success-message");
+
+    generateBtn.addEventListener("click", async () => {
+      const productKey = productSelect.value;
+      const logoFile = logoUpload.files[0];
+      const promptText = userPrompt.value.trim();
+
+      if (!productKey || !logoFile) {
+        preview.innerHTML = "<p style='color:red;'>⚠ Select a product and upload a logo.</p>";
+        return;
+      }
+
+      preview.innerHTML = "<p>Generating mockup…</p>";
+      successMessage.style.display = "none";
+
+      try {
+        // Convert logo file to Base64
+        const logoB64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result.split(",")[1]);
+          reader.onerror = error => reject(error);
+          reader.readAsDataURL(logoFile);
+        });
+
+        const res = await fetch(`${backendUrl}/generate-mockup-gemini`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            product_name: productKey,
+            logo_b64: logoB64,
+            extra_text: promptText
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+
+        const imgUrl = "data:image/png;base64," + data.image_b64;
+        preview.innerHTML = `
+          <div class="mockup-container">
+            <img src="${imgUrl}" class="product-image"/>
+          </div>
+          <button id="download-btn" style="
+            margin-top:10px;
+            padding:10px 20px;
+            background:#2e7d32;
+            color:#fff;
+            border:none;
+            border-radius:6px;
+            cursor:pointer;
+          ">Download Image</button>
+        `;
+        successMessage.style.display = "block";
+
+        document.getElementById("download-btn").addEventListener("click", () => {
+          const a = document.createElement("a");
+          a.href = imgUrl;
+          a.download = "mockup.png";
+          a.click();
+        });
+
+      } catch (err) {
+        preview.innerHTML = `<p style="color:red;">⚠ Error: ${err.message}</p>`;
+      }
+    });
+  </script>
+</body>
+</html>
