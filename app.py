@@ -37,7 +37,7 @@ PRODUCT_PROMPTS = {
     "bag": "Make a mockup of a paper bag with overlay of given logo. It should look realistic and the logo should look big according to the bag. Make whole bag according to logo background and do styling in whole bag.",
     "paper_bowl": "Render a clear, top-down photo of a paper food bowl with this logo on the side. The scene should be set in a bright, modern cafe.",
     "meal_box": "Generate a high-quality photo of a meal box with this logo on it,featuring soft studio lighting and a clean background ,realistic look ",
-    "wrapping_paper": "Apply the **uploaded logo** as a **seamless, tight, repeating pattern** covering the entire wrapping paper surface. The pattern should be small and evenly distributed, creating a continuous, branded background effect. Ensure the final look is realistic, maintaining the paper's texture and lighting. **Do not add any single, large, or centered logo.**",
+    "wrapping_paper": "Apply the **uploaded logo** as a **large, clean, repeating grid pattern** across the **entire visible surface** of the wrapping paper. Ensure the logos are **well-spaced** and continue in perfect rows and columns from edge to edge."
     "paper_napkin": "design according to professinal paper napkin, "
 }
 
