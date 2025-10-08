@@ -37,7 +37,7 @@ PRODUCT_PROMPTS = {
     "bag": "Generate a full, highly realistic packaging design studio mockup. Integrate the *uploaded logo* as a large, primary graphic on the center-front face of the standing paper shopping bag. *Generate and apply complementary design elements, lines, or subtle repeating patterns* based on the style of the uploaded logo and the product's function, across the visible surface areas of the bag to create a complete, branded look. *Strictly maintain the original product image's base color, texture, and background environment.* The logo and design must be applied with realistic lighting and shadows.",
 
     # 2. Wrapping Paper (All-Over Repeating Pattern)
-    "wrapping_paper": "Apply the **uploaded logo** as a **large, clean, repeating grid pattern** across the **entire visible surface** of the wrapping paper. Ensure the logos are **well-spaced** and continue in perfect rows and columns from edge to edge.",
+    "wrapping_paper": "Apply the **uploaded logo** as a **small to medium-sized, repeating pattern** across the entire paper surface. The pattern must be **scattered, non-overlapping, and uniformly spaced** to ensure every logo is clean and readable. **Strictly preserve the paper's original color and texture**.",
     # 3. Paper Napkin (SINGLE, CENTRAL Logo)
     "napkin": "A highly realistic, top-down studio photograph of a neatly stacked pile of white paper napkins. Place the *uploaded logo* as a *single, prominent graphic positioned perfectly in the center* of the top napkin of the stack. The logo should conform realistically to the subtle texture and slight imperfections of the napkin, with natural shadows and lighting. *Maintain the original color of the napkins and the background environment* of the mockup.",
 
