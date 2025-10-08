@@ -33,14 +33,23 @@ PRODUCT_MAP = {
 
 # Product-specific prompts
 PRODUCT_PROMPTS = {
-    "cup": "Generate a high-quality photo of a paper coffee cup with this logo on it, featuring soft studio lighting and a clean background.",
-    "bag": "Make a mockup of a paper bag with overlay of given logo. It should look realistic and the logo should look big according to the bag. Make whole bag according to logo background and do styling in whole bag.",
-    "paper_bowl": "Render a clear, top-down photo of a paper food bowl with this logo on the side. The scene should be set in a bright, modern cafe.",
-    "meal_box": "Generate a high-quality photo of a meal box with this logo on it,featuring soft studio lighting and a clean background ,realistic look ",
-    "wrapping_paper": "Apply the **uploaded logo** as a **large, clean, repeating grid pattern** across the **entire visible surface** of the wrapping paper. Ensure the logos are **well-spaced** and continue in perfect rows and columns from edge to edge."
-    "paper_napkin": "design according to professinal paper napkin, "
-}
+    # 1. Paper Bag (Full Packaging Design)
+    "bag": "Generate a full, highly realistic packaging design studio mockup. Integrate the *uploaded logo* as a large, primary graphic on the center-front face of the standing paper shopping bag. *Generate and apply complementary design elements, lines, or subtle repeating patterns* based on the style of the uploaded logo and the product's function, across the visible surface areas of the bag to create a complete, branded look. *Strictly maintain the original product image's base color, texture, and background environment.* The logo and design must be applied with realistic lighting and shadows.",
 
+    # 2. Wrapping Paper (All-Over Repeating Pattern)
+    "wrapping_paper": "Apply the **uploaded logo** as a **large, clean, repeating grid pattern** across the **entire visible surface** of the wrapping paper. Ensure the logos are **well-spaced** and continue in perfect rows and columns from edge to edge.",
+    # 3. Paper Napkin (SINGLE, CENTRAL Logo)
+    "napkin": "A highly realistic, top-down studio photograph of a neatly stacked pile of white paper napkins. Place the *uploaded logo* as a *single, prominent graphic positioned perfectly in the center* of the top napkin of the stack. The logo should conform realistically to the subtle texture and slight imperfections of the napkin, with natural shadows and lighting. *Maintain the original color of the napkins and the background environment* of the mockup.",
+
+    # 4. Meal Box (Full Packaging Design)
+    "meal_box": "Generate a full, highly realistic takeout packaging design studio mockup. Integrate the *uploaded logo* as a large, primary graphic centered on the top lid of the meal box. *Generate and apply complementary branding elements, graphic lines, or subtle repeating patterns* onto the side panels of the box, inspired by the style of the logo or the product's function, to create a complete, branded look. *Strictly maintain the original base colors and materials of the meal box*. The design must be realistically applied with texture, lighting, and shadows. The background environment of the mockup should remain unchanged.",
+
+    # 5. Paper Bowl (Full Packaging Design)
+    "paper_bowl": "Generate a full, highly realistic disposable packaging design studio mockup. Integrate the *uploaded logo* as a large, primary graphic on the exterior side of the paper bowl, conforming realistically to its curved surface. *Generate and apply complementary design elements or graphic patterns* around the main logo or on the rest of the bowl's exterior, inspired by the logo's style, to create a complete, branded look. *Strictly maintain the original base color and material texture of the bowl*. The design must show appropriate lighting and shadows. The background environment of the mockup should remain consistent with the base product image.",
+
+    # 6. Cup (Full Packaging Design)
+    "cup": "Generate a full, highly realistic disposable beverage packaging design studio mockup. Integrate the *uploaded logo* as a large, primary graphic centered on the front face of the cup. *Generate and apply complementary design elements, patterns, or graphic lines* onto the cup's surface, inspired by the logo's style, to complete the branded look. The design should conform realistically to the curved surface, displaying natural lighting, shadows, and subtle texture, while *strictly preserving the original base color of the cup and the background environment* of the mockup."
+}
 
 @app.route("/")
 def home():
