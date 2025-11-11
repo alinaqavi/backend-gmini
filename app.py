@@ -24,7 +24,7 @@ if not API_KEY:
 
 # --- Map product IDs to local static images (UPDATED PATHS) ---
 PRODUCT_MAP = {
-    "paper_cup": "static/Paper_Cup.jpeg",
+    "paper_cup": "static/Paper_Cup.jpg",
     "paper_bag": "static/Paper_Bag.webp",
     "paper_bowl": "static/paper_bowl.jpg",
     "meal_box": "static/meal_box.png",
