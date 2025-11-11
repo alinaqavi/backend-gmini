@@ -3,6 +3,7 @@ import os
 import requests
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
+from flask import Flask, render_template
 from dotenv import load_dotenv
 load_dotenv()
 # Note: You will need to add the fitz and PIL imports back 
@@ -60,11 +61,10 @@ def validate_file_type(filename):
         return False
     ext = os.path.splitext(filename.lower())[1]
     return ext in ALLOWED_EXTENSIONS
-
-@app.route("/")
+@app.route('/')
 def home():
     try:
-        return render_template("index.html")
+        return render_template('index.html')
     except Exception as e:
         return f"""
         <h1>Template Error</h1>
