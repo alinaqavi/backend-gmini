@@ -3,6 +3,8 @@ import base64
 import requests
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
+from dotenv import load_dotenv
+load_dotenv() 
 # Note: You will need to add the fitz and PIL imports back 
 # for PDF support, but they are not strictly needed to fix this NameError.
 
@@ -19,27 +21,25 @@ if not API_KEY:
     # For local testing, you can uncomment and replace with your key:
     # # API_KEY = "YOUR_FALLBACK_KEY_HERE"
 
-# --- Map product IDs to local static images (UNCHANGED) ---
+# --- Map product IDs to local static images (UPDATED PATHS) ---
 PRODUCT_MAP = {
-    "cup": "static/cup.png",
-    "bag": "static/bag.jpeg",
+    "paper_cup": "static/Paper_Cup.jpeg",
+    "paper_bag": "static/Paper_Bag.webp",
     "paper_bowl": "static/paper_bowl.jpg",
     "meal_box": "static/meal_box.png",
     "wrapping_paper": "static/wrapping_paper.jpg",
-    "napkin": "static/napkin.webp",
+    "paper_napkin": "static/paper_napkin.jpg",
 }
-
-# 💥 GENERIC_PROMPT HAS BEEN REMOVED 💥
 
 # Product-specific prompts
 PRODUCT_PROMPTS = {
     # 1. Paper Bag (Full Packaging Design)
-    "bag": "Generate a full, highly realistic packaging design studio mockup. Integrate the *uploaded logo* as a large, primary graphic on the center-front face of the standing paper shopping bag. *Generate and apply complementary design elements, lines, or subtle repeating patterns* based on the style of the uploaded logo and the product's function, across the visible surface areas of the bag to create a complete, branded look. *Strictly maintain the original product image's base color, texture, and background environment.* The logo and design must be applied with realistic lighting and shadows.",
+    "paper_bag": "Generate a full, highly realistic packaging design studio mockup. Integrate the *uploaded logo* as a large, primary graphic on the center-front face of the standing paper shopping bag. *Generate and apply complementary design elements, lines, or subtle repeating patterns* based on the style of the uploaded logo and the product's function, across the visible surface areas of the bag to create a complete, branded look. *Strictly maintain the original product image's base color, texture, and background environment.* The logo and design must be applied with realistic lighting and shadows.",
 
     # 2. Wrapping Paper (All-Over Repeating Pattern)
     "wrapping_paper": "Apply the **uploaded logo** as a **small to medium-sized, repeating pattern** across the entire paper surface. The pattern must be **scattered, non-overlapping, and uniformly spaced** to ensure every logo is clean and readable. **Strictly preserve the paper's original color and texture**.",
     # 3. Paper Napkin (SINGLE, CENTRAL Logo)
-    "napkin": "A highly realistic, top-down studio photograph of a neatly stacked pile of white paper napkins. Place the *uploaded logo* as a *single, prominent graphic positioned perfectly in the center* of the top napkin of the stack. The logo should conform realistically to the subtle texture and slight imperfections of the napkin, with natural shadows and lighting. *Maintain the original color of the napkins and the background environment* of the mockup.",
+    "paper_napkin": "A highly realistic, top-down studio photograph of a neatly stacked pile of white paper napkins. Place the *uploaded logo* as a *single, prominent graphic positioned perfectly in the center* of the top napkin of the stack. The logo should conform realistically to the subtle texture and slight imperfections of the napkin, with natural shadows and lighting. *Maintain the original color of the napkins and the background environment* of the mockup.",
 
     # 4. Meal Box (Full Packaging Design)
     "meal_box": "Generate a full, highly realistic takeout packaging design studio mockup. Integrate the *uploaded logo* as a large, primary graphic centered on the top lid of the meal box. *Generate and apply complementary branding elements, graphic lines, or subtle repeating patterns* onto the side panels of the box, inspired by the style of the logo or the product's function, to create a complete, branded look. *Strictly maintain the original base colors and materials of the meal box*. The design must be realistically applied with texture, lighting, and shadows. The background environment of the mockup should remain unchanged.",
@@ -48,8 +48,18 @@ PRODUCT_PROMPTS = {
     "paper_bowl": "Generate a full, highly realistic disposable packaging design studio mockup. Integrate the *uploaded logo* as a large, primary graphic on the exterior side of the paper bowl, conforming realistically to its curved surface. *Generate and apply complementary design elements or graphic patterns* around the main logo or on the rest of the bowl's exterior, inspired by the logo's style, to create a complete, branded look. *Strictly maintain the original base color and material texture of the bowl*. The design must show appropriate lighting and shadows. The background environment of the mockup should remain consistent with the base product image.",
 
     # 6. Cup (Full Packaging Design)
-    "cup": "Generate a full, highly realistic disposable beverage packaging design studio mockup. Integrate the *uploaded logo* as a large, primary graphic centered on the front face of the cup. *Generate and apply complementary design elements, patterns, or graphic lines* onto the cup's surface, inspired by the logo's style, to complete the branded look. The design should conform realistically to the curved surface, displaying natural lighting, shadows, and subtle texture, while *strictly preserving the original base color of the cup and the background environment* of the mockup."
+    "paper_cup": "Generate a full, highly realistic disposable beverage packaging design studio mockup. Integrate the *uploaded logo* as a large, primary graphic centered on the front face of the cup. *Generate and apply complementary design elements, patterns, or graphic lines* onto the cup's surface, inspired by the logo's style, to complete the branded look. The design should conform realistically to the curved surface, displaying natural lighting, shadows, and subtle texture, while *strictly preserving the original base color of the cup and the background environment* of the mockup."
 }
+
+# Allowed file extensions for validation
+ALLOWED_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.gif', '.pdf', '.webp', '.bmp', '.tiff'}
+
+def validate_file_type(filename):
+    """Validate if the uploaded file has an allowed extension"""
+    if not filename:
+        return False
+    ext = os.path.splitext(filename.lower())[1]
+    return ext in ALLOWED_EXTENSIONS
 
 @app.route("/")
 def home():
@@ -64,13 +74,25 @@ def generate_mockup():
         data = request.get_json()
         product_name = data.get("product_name")
         logo_b64 = data.get("logo_b64")
-        logo_mime_type = data.get("logo_mime_type", "image/png") 
+        logo_mime_type = data.get("logo_mime_type", "image/png")
+        logo_filename = data.get("logo_filename", "")
         user_design_prompt = data.get("design_prompt", "").strip()
+        brand_name = data.get("brand_name", "").strip()
+        color_palette = data.get("color_palette", "").strip()
 
-        if not product_name or not logo_b64:
-            return jsonify({"error": "Missing product name or logo"}), 400
+        # Validate product name
+        if not product_name:
+            return jsonify({"error": "Missing product name"}), 400
         
-        # --- (Place the FULL PDF CONVERSION LOGIC HERE later) ---
+        # Validate that either logo OR brand name is provided
+        if not logo_b64 and not brand_name:
+            return jsonify({"error": "Please provide either a logo file OR a brand name"}), 400
+        
+        # Validate file type if logo is uploaded
+        if logo_b64 and logo_filename:
+            if not validate_file_type(logo_filename):
+                allowed = ', '.join(ALLOWED_EXTENSIONS)
+                return jsonify({"error": f"Invalid file type. Allowed formats: {allowed}"}), 400
 
         product_image_path = PRODUCT_MAP.get(product_name)
         if not product_image_path or not os.path.exists(product_image_path):
@@ -87,38 +109,56 @@ def generate_mockup():
         elif product_image_path.endswith(".png"):
             product_mime_type = "image/png"
 
-
-        # --- UPDATED PROMPT CONSTRUCTION LOGIC ---
+        # Build the final prompt based on what the user provided
         product_specific_prompt = PRODUCT_PROMPTS.get(product_name, "")
         
-        if user_design_prompt:
-            final_prompt = f"{user_design_prompt}. {product_specific_prompt}"
+        if logo_b64 and brand_name:
+            # CONDITION 3: Both logo and brand name
+            final_prompt = f"Generate a mockup with BOTH the uploaded logo AND the brand name '{brand_name}'. Place the logo prominently and add the brand name text nearby (e.g., below or beside the logo). {product_specific_prompt}"
+        elif logo_b64:
+            # CONDITION 2: Logo only
+            final_prompt = f"Generate a mockup with ONLY the uploaded logo. {product_specific_prompt}"
+        elif brand_name:
+            # CONDITION 1: Brand name only (no logo uploaded)
+            final_prompt = f"Generate a mockup with ONLY the brand name text '{brand_name}'. Create an attractive text-based design with the brand name prominently displayed. {product_specific_prompt}"
         else:
-            final_prompt = product_specific_prompt
+            return jsonify({"error": "Missing logo or brand name"}), 400
+        
+        # Add color palette FIRST if provided (so it takes priority)
+        if color_palette and color_palette != "None":
+            final_prompt = f"Use the color palette: {color_palette}. {final_prompt}"
+        
+        # Add user's custom design prompt at the BEGINNING (highest priority)
+        if user_design_prompt:
+            final_prompt = f"{user_design_prompt}. {final_prompt}"
             
         if not final_prompt:
              return jsonify({"error": f"Missing specific prompt for product: {product_name}"}), 400
-        # ----------------------------------------
 
         # Prepare Gemini API payload
+        payload_parts = [{"text": final_prompt}]
+        
+        # Always add product image
+        payload_parts.append({
+            "inlineData": {
+                "mimeType": product_mime_type, 
+                "data": product_b64
+            }
+        })
+        
+        # Only add logo image if it was uploaded
+        if logo_b64:
+            payload_parts.append({
+                "inlineData": {
+                    "mimeType": logo_mime_type, 
+                    "data": logo_b64
+                }
+            })
+        
         payload = {
             "contents": [
                 {
-                    "parts": [
-                        {"text": final_prompt}, 
-                        {
-                            "inlineData": {
-                                "mimeType": product_mime_type, 
-                                "data": product_b64
-                            }
-                        },
-                        {
-                            "inlineData": {
-                                "mimeType": logo_mime_type, 
-                                "data": logo_b64
-                            }
-                        }
-                    ]
+                    "parts": payload_parts
                 }
             ],
             "generationConfig": {
