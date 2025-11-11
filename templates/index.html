@@ -79,7 +79,7 @@ body {
 /* --- 4. CAROUSEL STYLES --- */
 .product-carousel-wrapper { position:relative; margin-bottom:30px; padding:0 10px; width: 100%; box-sizing: border-box; }
 .product-carousel-inner-container { overflow:hidden; border:1px solid var(--border-color); border-radius:10px; padding:15px; }
-.product-carousel { display:flex; overflow-x:hidden; scroll-behavior:smooth; gap:15px; }
+.product-carousel { display:flex; overflow-x:scroll; scroll-behavior:smooth; gap:15px; }
 .carousel-arrow { position:absolute; top:50%; transform:translateY(-50%); background-color:var(--card-background); border:1px solid var(--border-color); border-radius:50%; width:35px; height:35px; display:flex; justify-content:center; align-items:center; font-size:20px; color:var(--text-color-dark); cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,0.1); transition:all 0.2s ease; z-index:11; }
 .carousel-arrow.left { left:-5px; }
 .carousel-arrow.right { right:-5px; }
@@ -105,8 +105,19 @@ body {
     box-sizing: border-box; 
 }
 .logo-drop-zone:hover { background-color:#e8f5e9; }
-.input-group { margin-bottom: 25px; width: 100%; } /* Increased margin for spacing */
+.input-group { margin-bottom: 25px; width: 100%; }
 .input-group label { display: block; font-weight: 600; color: var(--text-color-dark); margin-bottom: 5px; font-size: 14px; }
+.input-group input[type="text"], .input-group select { 
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 14px;
+    transition: border-color 0.2s;
+    background-color: var(--card-background);
+}
+.input-group input:focus, .input-group select:focus { border-color: var(--primary-color); outline: none; }
 .input-group textarea {
     width: 100%;
     padding: 10px;
@@ -120,6 +131,51 @@ body {
 }
 .input-group textarea:focus { border-color: var(--primary-color); outline: none; }
 
+/* Color Palette Picker Styles */
+.color-palette-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+.color-palette-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: var(--card-background);
+}
+.color-palette-option:hover {
+    border-color: var(--primary-color);
+    background-color: #f0fdf4;
+}
+.color-palette-option.active {
+    border-color: var(--primary-color);
+    background-color: #e8f5e9;
+    box-shadow: 0 0 0 2px #c8e6c9;
+}
+.color-boxes {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 5px;
+}
+.color-box {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+.color-palette-name {
+    font-size: 10px;
+    color: var(--text-color-dark);
+    text-align: center;
+    font-weight: 500;
+}
+
 /* Spinner and Loading Button Styles */
 .generate-btn {
     width:100%; padding:14px; border:none; border-radius:8px; 
@@ -130,7 +186,11 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: auto; /* Push button to the bottom of the control panel */
+    margin-top: 15px;
+}
+.generate-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 .spinner-container { display: flex; align-items: center; gap: 8px; color: white; }
 .spinner {
@@ -143,7 +203,7 @@ body {
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 .loading .generate-btn-text { display: none; }
 .loading .spinner-container { display: flex !important; }
-.generate-btn:hover { background-color:var(--primary-dark); }
+.generate-btn:hover:not(:disabled) { background-color:var(--primary-dark); }
 
 .success-message-text { color:var(--success-color); font-size:18px; font-weight:600; display:flex; align-items:center; gap:8px; margin-top:15px; display:none; }
 .download-btn { background-color:var(--primary-dark); color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:600; font-size:16px; display:flex; align-items:center; gap:8px; transition:background-color 0.2s ease; margin-top:10px; display:none; }
@@ -180,22 +240,19 @@ body {
             <div class="carousel-arrow right" id="arrowRight">&#10095;</div>
         </div>
 
-        <p style="font-weight:600;color:var(--text-color-dark);margin-bottom:10px;">2. Upload Your Design/Logo (Any File Type):</p>
-        <input type="file" id="logoInput" style="display:none;" accept="*/*">
+        <p style="font-weight:600;color:var(--text-color-dark);margin-bottom:10px;">2. Upload Your Design/Logo:</p>
+        <input type="file" id="logoInput" style="display:none;" accept=".jpg,.jpeg,.png,.gif,.pdf,.webp,.bmp,.tiff">
         <div class="logo-drop-zone" id="dropZone"><span style="font-size:24px;">&#8634;</span> Drag & Drop or Click to Upload File</div>
 
         <div class="input-group">
-            <label for="designDescription">3. Describe your design (Optional)</label>
-            <textarea id="designDescription" rows="3" placeholder="e.g., Make the logo slightly larger and place it at the top center. The bag color should be dark green."></textarea>
+            <label for="brandName">3. Brand Name (Optional fallback for design)</label>
+            <input type="text" id="brandName" placeholder="e.g., Green Earth Cafe">
         </div>
         
-        <button class="generate-btn" id="generateBtn">
-            <span class="generate-btn-text">✨ Generate Final Mockup</span>
-            <span class="spinner-container" style="display:none;">
-                <div class="spinner"></div>
-                <span id="progressPercentage">0%</span>
-            </span>
-        </button>
+        <div class="input-group">
+            <label>4. Color Palette (Optional)</label>
+            <div class="color-palette-grid" id="colorPaletteGrid"></div>
+        </div>
     </div>
 
     <div class="preview-area">
@@ -203,21 +260,46 @@ body {
         <div class="mockup-image-placeholder" id="finalMockupPlaceholder">
             <div class="mockup-logo-overlay">CHOOSE TEMPLATE</div>
         </div>
+
+        <div class="input-group" style="width:100%; max-width:700px;">
+            <label for="designDescription">5. Describe your design (Optional)</label>
+            <textarea id="designDescription" rows="3" placeholder="e.g., Make the logo slightly larger and place it at the top center. The bag color should be dark green."></textarea>
+        </div>
+        
+        <button class="generate-btn" id="generateBtn" style="max-width:700px;">
+            <span class="generate-btn-text">✨ Generate Final Mockup</span>
+            <span class="spinner-container" style="display:none;">
+                <div class="spinner"></div>
+                <span id="progressPercentage">0%</span>
+            </span>
+        </button>
+        
         <p class="success-message-text" id="successMessage"><span style="font-size:1.5em;">&#10003;</span> Mockup successfully generated!</p>
-        <a href="#" id="downloadBtn" class="download-btn" download="mockup_generated.png"><span style="font-size:1.2em;">&#11123;</span> Download Mockup</a>
+        <a href="#" id="downloadBtn" class="download-btn" download="mockup_generated.png" style="max-width:700px;">
+            <span style="font-size:1.2em;">&#11123;</span> Download Mockup
+        </a>
     </div>
 </div>
 
 <div id="lightboxOverlay"></div>
-
 <script>
 const productsData = [
-    { id: 'cup', name: 'Paper cup', image_url: 'static/cup.png' }, 
-    { id: 'bag', name: 'Paper Bag', image_url: 'static/bag.jpeg' }, 
-    { id: 'paper_bowl', name: 'Paper Bowl', image_url: 'static/paper_bowl.jpg' },
-    { id: 'meal_box', name: 'Meal Box', image_url: 'static/meal_box.png' }, 
-    { id: 'wrapping_paper', name: 'Wrapping Paper', image_url: 'static/wrapping_paper.jpg' }, 
-    { id: 'napkin', name: 'Paper Napkin', image_url: 'static/napkin.webp' }
+    { id: 'paper_cup', name: 'Paper Cup', image_url: 'static/paper_cup.jpeg' },
+    { id: 'paper_bag', name: 'Paper Bag', image_url: 'static/Paper_Bag.webp' },
+    { id: 'paper_bowl', name: 'Paper Bowl', image_url: 'static/paper_bowl.jpg' },
+    { id: 'meal_box', name: 'Meal Box', image_url: 'static/meal_box.png' },
+    { id: 'wrapping_paper', name: 'Wrapping Paper', image_url: 'static/wrapping_paper.jpg' },
+    { id: 'paper_napkin', name: 'Paper Napkin', image_url: 'static/paper_napkin.jpg' }
+];
+
+const colorPalettes = [
+    { name: 'None', colors: [] },
+    { name: 'Navy & Gold', colors: ['#001f3f', '#FFD700'] },
+    { name: 'Black & White', colors: ['#000000', '#FFFFFF'] },
+    { name: 'Red & Green', colors: ['#FF0000', '#00FF00'] },
+    { name: 'Purple & Cream', colors: ['#800080', '#FFFDD0'] },
+    { name: 'Orange & Black', colors: ['#FFA500', '#000000'] },
+    { name: 'Sky Blue & Gray', colors: ['#87CEEB', '#808080'] }
 ];
     
 document.addEventListener('DOMContentLoaded', () => {
@@ -231,32 +313,113 @@ document.addEventListener('DOMContentLoaded', () => {
     const successMessage = document.getElementById('successMessage');
     const downloadBtn = document.getElementById('downloadBtn');
     const lightboxOverlay = document.getElementById('lightboxOverlay');
-    
-    // Description input
-    const designDescriptionInput = document.getElementById('designDescription');
+    const brandNameInput = document.getElementById('brandName');
+    const colorPaletteGrid = document.getElementById('colorPaletteGrid');
     const progressPercentage = document.getElementById('progressPercentage');
-    const generateBtnText = document.querySelector('#generateBtn .generate-btn-text');
 
     let activeProductId = null;
     let uploadedLogoFile = null; 
     let uploadedLogoMimeType = "image/png"; 
-    let generatedMockupDataUrl = null; 
+    let generatedMockupDataUrl = null;
+    let selectedColorPalette = 'None';
 
-    // --- Product Selection (UNCHANGED) ---
+    // --- Color Palette Rendering ---
+    function renderColorPalettes() {
+        colorPaletteGrid.innerHTML = '';
+        colorPalettes.forEach(palette => {
+            const paletteOption = document.createElement('div');
+            paletteOption.classList.add('color-palette-option');
+            if (palette.name === selectedColorPalette) {
+                paletteOption.classList.add('active');
+            }
+            
+            if (palette.colors.length > 0) {
+                const colorBoxes = document.createElement('div');
+                colorBoxes.classList.add('color-boxes');
+                palette.colors.forEach(color => {
+                    const colorBox = document.createElement('div');
+                    colorBox.classList.add('color-box');
+                    colorBox.style.backgroundColor = color;
+                    colorBoxes.appendChild(colorBox);
+                });
+                paletteOption.appendChild(colorBoxes);
+            } else {
+                const noColorBox = document.createElement('div');
+                noColorBox.style.width = '60px';
+                noColorBox.style.height = '30px';
+                noColorBox.style.border = '1px solid #ccc';
+                noColorBox.style.borderRadius = '4px';
+                noColorBox.style.display = 'flex';
+                noColorBox.style.alignItems = 'center';
+                noColorBox.style.justifyContent = 'center';
+                noColorBox.style.fontSize = '10px';
+                noColorBox.style.color = '#999';
+                noColorBox.textContent = 'None';
+                paletteOption.appendChild(noColorBox);
+            }
+            
+            const paletteName = document.createElement('div');
+            paletteName.classList.add('color-palette-name');
+            paletteName.textContent = palette.name;
+            paletteOption.appendChild(paletteName);
+            
+            paletteOption.addEventListener('click', () => {
+                selectedColorPalette = palette.name;
+                document.querySelectorAll('.color-palette-option').forEach(opt => opt.classList.remove('active'));
+                paletteOption.classList.add('active');
+                
+                // Reset mockup preview when color changes
+                successMessage.style.display = 'none';
+                downloadBtn.style.display = 'none';
+                generatedMockupDataUrl = null;
+                
+                checkGenerateButtonState();
+            });
+            
+            colorPaletteGrid.appendChild(paletteOption);
+        });
+    }
+
+    // --- Check Generate Button State ---
+    function checkGenerateButtonState() {
+        const productSelected = activeProductId !== null && activeProductId !== "";
+        const logoUploaded = !!uploadedLogoFile;
+        const brandName = brandNameInput.value.trim() !== "";
+
+        if (productSelected && (logoUploaded || brandName)) {
+            generateBtn.disabled = false;
+            generateBtn.style.opacity = '1';
+            generateBtn.style.cursor = 'pointer';
+        } else {
+            generateBtn.disabled = true;
+            generateBtn.style.opacity = '0.6';
+            generateBtn.style.cursor = 'not-allowed';
+        }
+    }
+
+    // --- Product Selection ---
     function setActiveProduct(productId){
         document.querySelectorAll('.product-card').forEach(c=>c.classList.remove('active'));
         const activeCard = document.querySelector(`.product-card[data-product="${productId}"]`);
+        
+        successMessage.style.display='none'; 
+        downloadBtn.style.display='none';
+        generatedMockupDataUrl = null;
+        
         if(activeCard){
             activeProductId = productId;
             activeCard.classList.add('active');
+
+            const current = productsData.find(p=>p.id===activeProductId);
+            if(current){
+                finalMockupPlaceholder.innerHTML=`<img src="${current.image_url}" style="max-width:100%; max-height:100%; object-fit:contain;" alt="${current.name} Preview">`;
+            }
+        } else {
+            activeProductId = null;
+            finalMockupPlaceholder.innerHTML = '<div class="mockup-logo-overlay">CHOOSE PRODUCTS</div>';
         }
-        const current = productsData.find(p=>p.id===activeProductId);
-        if(current){
-            finalMockupPlaceholder.innerHTML=`<img src="${current.image_url}" style="max-width:100%; max-height:100%; object-fit:contain;" alt="${current.name} Preview">`;
-            successMessage.style.display='none'; 
-            downloadBtn.style.display='none';
-            generatedMockupDataUrl = null;
-        }
+        
+        checkGenerateButtonState();
     }
 
     function renderAllProducts(){
@@ -268,49 +431,71 @@ document.addEventListener('DOMContentLoaded', () => {
             card.addEventListener('click',()=>setActiveProduct(p.id));
             productCarousel.appendChild(card);
         });
-        if(productsData.length>0)setActiveProduct(productsData[0].id);
+        setActiveProduct(null); 
     }
 
     arrowLeft.addEventListener('click',()=>productCarousel.scrollBy({left:-105,behavior:'smooth'}));
     arrowRight.addEventListener('click',()=>productCarousel.scrollBy({left:105,behavior:'smooth'}));
 
-    // --- File Upload Handling (CLEANED) ---
+    // --- File Upload Handling ---
     function resetLogoInput() {
         uploadedLogoFile = null;
         uploadedLogoMimeType = "image/png";
-        logoInput.value = ''; // Clear file input
+        logoInput.value = '';
         dropZone.innerHTML = '<span style="font-size:24px;">&#8634;</span> Drag & Drop or Click to Upload File';
+        checkGenerateButtonState();
+    }
+
+    // Allowed file extensions
+    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.pdf', '.webp', '.bmp', '.tiff'];
+    
+    function validateFileExtension(filename) {
+        const ext = filename.slice(filename.lastIndexOf('.')).toLowerCase();
+        return allowedExtensions.includes(ext);
     }
 
     dropZone.addEventListener('click',()=>logoInput.click());
     
     logoInput.addEventListener('change',e=>{
         if(e.target.files.length>0){
-            uploadedLogoFile=e.target.files[0];
-            uploadedLogoMimeType = uploadedLogoFile.type || "application/octet-stream";
-            // Update the drop zone text clearly
-            dropZone.innerHTML=`File selected: <strong>${uploadedLogoFile.name}</strong> (${uploadedLogoMimeType})`;
+            const file = e.target.files[0];
+            if (!validateFileExtension(file.name)) {
+                alert(`Invalid file type. Allowed formats: ${allowedExtensions.join(', ')}`);
+                resetLogoInput();
+                return;
+            }
+            uploadedLogoFile = file;
+            uploadedLogoMimeType = file.type || "application/octet-stream";
+            dropZone.innerHTML=`File selected: <strong>${file.name}</strong>`;
+            checkGenerateButtonState();
         } else {
             resetLogoInput();
         }
     });
 
-    // Drag and Drop listeners
     dropZone.addEventListener('dragover',e=>{e.preventDefault(); dropZone.style.backgroundColor='#e8f5e9';});
     dropZone.addEventListener('dragleave',()=>{dropZone.style.backgroundColor='#f0fdf4';});
     dropZone.addEventListener('drop',e=>{
         e.preventDefault(); dropZone.style.backgroundColor='#f0fdf4';
         const files=e.dataTransfer.files;
         if(files.length>0){
-            uploadedLogoFile=files[0];
-            uploadedLogoMimeType = uploadedLogoFile.type || "application/octet-stream";
-            logoInput.files=files; // Set the file input for consistency
-            // Update the drop zone text clearly
-            dropZone.innerHTML=`File selected: <strong>${uploadedLogoFile.name}</strong> (${uploadedLogoMimeType})`;
+            const file = files[0];
+            if (!validateFileExtension(file.name)) {
+                alert(`Invalid file type. Allowed formats: ${allowedExtensions.join(', ')}`);
+                return;
+            }
+            uploadedLogoFile = file;
+            uploadedLogoMimeType = file.type || "application/octet-stream";
+            logoInput.files=files;
+            dropZone.innerHTML=`File selected: <strong>${file.name}</strong>`;
+            checkGenerateButtonState();
         }
     });
 
-    // --- Utility Functions (UNCHANGED) ---
+    // Brand name input listener
+    brandNameInput.addEventListener('input', checkGenerateButtonState);
+
+    // --- Utility Functions ---
     function startLoading(button) {
         button.classList.add('loading');
         button.disabled = true;
@@ -321,7 +506,7 @@ document.addEventListener('DOMContentLoaded', () => {
         button.classList.remove('loading');
         button.disabled = false;
         document.querySelector('#generateBtn .spinner-container').style.display = 'none';
-        generateBtnText.style.display = 'inline';
+        document.querySelector('.generate-btn-text').style.display = 'inline';
     }
     
     function updateProgress(percentage) {
@@ -337,17 +522,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Mockup Generation Function (CLEANED) ---
+    // --- Mockup Generation Function ---
     async function generateMockupHandler() {
-
         if (!activeProductId) {
             alert('Please select a product template first!');
             return;
         }
 
-        // Check ONLY for uploaded file 
-        if (!uploadedLogoFile) {
-            alert('Please upload a design/logo file.');
+        const brandName = brandNameInput.value.trim();
+        const designDescriptionInput = document.getElementById('designDescription');
+        const userDesignPrompt = designDescriptionInput ? designDescriptionInput.value.trim() : '';
+        const colorPalette = selectedColorPalette;
+        
+        if (!uploadedLogoFile && !brandName) {
+            alert('Please upload a design/logo file OR enter a Brand Name.');
             return;
         }
         
@@ -356,7 +544,6 @@ document.addEventListener('DOMContentLoaded', () => {
         generatedMockupDataUrl = null;
         startLoading(generateBtn);
         
-        // Progress simulation
         let percentage = 0;
         updateProgress(0);
         const progressInterval = setInterval(() => {
@@ -368,18 +555,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             let logoBase64 = null;
-            let logoMimeType = uploadedLogoMimeType; 
+            let logoMimeType = uploadedLogoMimeType;
+            let logoFilename = '';
 
-            // Convert file to Base64
-            logoBase64 = await new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                // We only need the base64 part, not the 'data:mime/type;base64,' prefix
-                reader.onload = () => resolve(reader.result.split(',')[1]); 
-                reader.onerror = reject;
-                reader.readAsDataURL(uploadedLogoFile);
-            });
-
-            const userDesignPrompt = designDescriptionInput.value.trim();
+            if (uploadedLogoFile) {
+                logoBase64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result.split(',')[1]); 
+                    reader.onerror = reject;
+                    reader.readAsDataURL(uploadedLogoFile);
+                });
+                logoFilename = uploadedLogoFile.name;
+            }
 
             const response = await fetch('/generate-mockup', {
                 method: 'POST',
@@ -387,8 +574,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({
                     product_name: activeProductId,
                     logo_b64: logoBase64,
-                    logo_mime_type: logoMimeType, 
-                    design_prompt: userDesignPrompt 
+                    logo_mime_type: logoMimeType,
+                    logo_filename: logoFilename,
+                    design_prompt: userDesignPrompt,
+                    brand_name: brandName,
+                    color_palette: colorPalette
                 })
             });
 
@@ -400,7 +590,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 stopLoading(generateBtn);
                 
                 if (data.image_b64) {
-                    // Assuming the backend returns the *newly generated* image as base64
                     generatedMockupDataUrl = `data:image/png;base64,${data.image_b64}`;
                     updateMockupPreview(generatedMockupDataUrl);
 
@@ -408,7 +597,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     downloadBtn.style.display = 'flex';
                     downloadBtn.href = generatedMockupDataUrl;
                     downloadBtn.download = `mockup_${activeProductId}.png`;
-
                 } else {
                     alert('Backend Error: ' + (data.error || 'No image data returned.'));
                 }
@@ -423,14 +611,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-
     // --- EVENT LISTENERS ---
     generateBtn.addEventListener('click', generateMockupHandler);
-
     lightboxOverlay.addEventListener('click', () => { lightboxOverlay.style.display = 'none'; lightboxOverlay.innerHTML = ''; });
 
     // Initial render
     renderAllProducts();
+    renderColorPalettes();
+    checkGenerateButtonState();
 });
 </script>
 </body>
