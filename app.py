@@ -3,8 +3,6 @@ import base64
 import requests
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
-from dotenv import load_dotenv
-load_dotenv() 
 # Note: You will need to add the fitz and PIL imports back 
 # for PDF support, but they are not strictly needed to fix this NameError.
 
@@ -195,4 +193,5 @@ def generate_mockup():
 
 
 if __name__ == "__main__": 
-    app.run(host="0.0.0.0", port=8080, debug=True)
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port, debug=False)
