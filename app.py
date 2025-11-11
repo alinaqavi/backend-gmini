@@ -1,8 +1,10 @@
-import os
 import base64
+import os 
 import requests
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
+from dotenv import load_dotenv
+load_dotenv()
 # Note: You will need to add the fitz and PIL imports back 
 # for PDF support, but they are not strictly needed to fix this NameError.
 
@@ -61,7 +63,14 @@ def validate_file_type(filename):
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    try:
+        return render_template("index.html")
+    except Exception as e:
+        return f"""
+        <h1>Template Error</h1>
+        <p>Error: {str(e)}</p>
+        <p>Make sure templates/index.html exists in your project.</p>
+        """, 500
 
 @app.route("/generate-mockup", methods=["POST"])
 def generate_mockup():
