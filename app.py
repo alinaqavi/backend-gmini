@@ -11,7 +11,7 @@ load_dotenv()
 
 # ---------------- Flask App config ----------------
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 # ---------------- Gemini API config ----------------
 API_KEY = os.environ.get("GEMINI_API_KEY") 
@@ -24,7 +24,7 @@ if not API_KEY:
 
 # --- Map product IDs to local static images (UPDATED PATHS) ---
 PRODUCT_MAP = {
-    "cup": "static/cup.png",
+    "paper_cup": "static/Paper_Cup.jpeg",
     "paper_bag": "static/Paper_Bag.webp",
     "paper_bowl": "static/paper_bowl.jpg",
     "meal_box": "static/meal_box.png",
@@ -49,7 +49,7 @@ PRODUCT_PROMPTS = {
     "paper_bowl": "Generate a full, highly realistic disposable packaging design studio mockup. Integrate the *uploaded logo* as a large, primary graphic on the exterior side of the paper bowl, conforming realistically to its curved surface. *Generate and apply complementary design elements or graphic patterns* around the main logo or on the rest of the bowl's exterior, inspired by the logo's style, to create a complete, branded look. *Strictly maintain the original base color and material texture of the bowl*. The design must show appropriate lighting and shadows. The background environment of the mockup should remain consistent with the base product image.",
 
     # 6. Cup (Full Packaging Design)
-    "cup": "Generate a full, highly realistic disposable beverage packaging design studio mockup. Integrate the *uploaded logo* as a large, primary graphic centered on the front face of the cup. *Generate and apply complementary design elements, patterns, or graphic lines* onto the cup's surface, inspired by the logo's style, to complete the branded look. The design should conform realistically to the curved surface, displaying natural lighting, shadows, and subtle texture, while *strictly preserving the original base color of the cup and the background environment* of the mockup."
+    "paper_cup": "Generate a full, highly realistic disposable beverage packaging design studio mockup. Integrate the *uploaded logo* as a large, primary graphic centered on the front face of the cup. *Generate and apply complementary design elements, patterns, or graphic lines* onto the cup's surface, inspired by the logo's style, to complete the branded look. The design should conform realistically to the curved surface, displaying natural lighting, shadows, and subtle texture, while *strictly preserving the original base color of the cup and the background environment* of the mockup."
 }
 
 # Allowed file extensions for validation
