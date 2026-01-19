@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Mockup Generator</title>
 <style>
-/* --- 1. THEME VARIABLES --- */
 :root { 
-/* Theme variables */
 --primary-color: #4CAF50;
 --primary-dark: #388E3C;
 --background-color: #f0fdf4;
@@ -19,7 +17,6 @@
 --success-color: #1b5e20;
 }
 
-/* FULL SCREEN: Set body to full viewport dimensions, no margins/padding */
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--background-color);
@@ -33,7 +30,6 @@ body {
     overflow-x: hidden;
 }
 
-/* FULL SCREEN: Set main container to full viewport size */
 .generator-container {
     width: 100vw;
     max-width: 100vw;
@@ -45,7 +41,6 @@ body {
     display: flex;
 }
 
-/* --- 2. LAYOUT & PANELS --- */
 .control-panel {
     flex: 1;
     min-width: 380px;
@@ -59,7 +54,6 @@ body {
 .preview-area { flex: 2; padding: 30px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; background-color: #f8fff9; }
 .preview-area-header { font-size: 18px; color: var(--text-color-dark); font-weight: 600; margin-bottom: 15px; }
 
-/* --- 3. MOCKUP PREVIEW & IMAGE --- */
 .mockup-image-placeholder {
     width: 100%;
     max-width: 700px;
@@ -77,19 +71,17 @@ body {
 .mockup-image-placeholder img { max-width: 100%; max-height: 100%; object-fit: contain; cursor: pointer; transition: all 0.3s ease; }
 .mockup-logo-overlay { background-color: var(--primary-color); color: white; padding: 15px 30px; border-radius: 10px; font-weight: bold; font-size: 22px; }
 
-/* --- 4. CAROUSEL STYLES --- */
 .product-carousel-wrapper { position: relative; margin-bottom: 30px; padding: 0 10px; width: 100%; box-sizing: border-box; }
-.product-carousel-inner-container { overflow: hidden; border: 1px solid var(--border-color); border-radius: 10px; padding: 15px; }
+.product-carousel-inner-container { overflow: hidden; border: 1px solid var(--border-color); border-radius: 10px; padding: 15px; background-color: white; }
 .product-carousel { display: flex; overflow-x: scroll; scroll-behavior: smooth; gap: 15px; }
 .carousel-arrow { position: absolute; top: 50%; transform: translateY(-50%); background-color: var(--card-background); border: 1px solid var(--border-color); border-radius: 50%; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; font-size: 20px; color: var(--text-color-dark); cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: all 0.2s ease; z-index: 11; }
 .carousel-arrow.left { left: -5px; }
 .carousel-arrow.right { right: -5px; }
 .product-card { flex-shrink: 0; width: 130px; padding: 10px; border: 2px solid var(--border-color); border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.2s ease; background-color: var(--card-background); }
 .product-card.active { border-color: var(--primary-color); background-color: #e8f5e9; box-shadow: 0 0 0 3px #c8e6c9; }
-.product-real-image { width: 100%; height: 100px; object-fit: contain; border-radius: 4px; margin-bottom: 8px; border: 1px solid var(--border-color); }
+.product-real-image { width: 100%; height: 100px; object-fit: contain; border-radius: 4px; margin-bottom: 8px; border: 1px solid var(--border-color); background-color: #f5f5f5; }
 .product-name { font-size: 13px; color: var(--text-color-dark); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* --- 5. INPUTS AND BUTTONS (Updated for cleaner look) --- */
 .logo-drop-zone {
     border: 2px dashed var(--primary-color);
     border-radius: 10px;
@@ -132,7 +124,6 @@ body {
 }
 .input-group textarea:focus { border-color: var(--primary-color); outline: none; }
 
-/* Single Color Picker Styles */
 .color-picker-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(35px, 1fr));
@@ -165,7 +156,6 @@ body {
     text-shadow: 0 0 2px rgba(0,0,0,0.5);
 }
 
-/* Spinner and Loading Button Styles */
 .generate-btn {
     width: 100%;
     padding: 14px;
@@ -194,11 +184,19 @@ body {
 .download-btn { background-color:var(--primary-dark); color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:600; font-size:16px; display:flex; align-items:center; gap:8px; transition:background-color 0.2s ease; margin-top:10px; display:none; }
 .download-btn:hover { background-color:#2e7d32; }
 
-/* --- 6. LIGHTBOX --- */
 #lightboxOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index:9999; }
 #lightboxOverlay img { max-width:90%; max-height:90%; border-radius:12px; box-shadow:0 0 20px rgba(0,0,0,0.5); cursor:zoom-out; }
 
-/* --- 7. RESPONSIVENESS --- */
+.error-message {
+    color: #d32f2f;
+    font-size: 14px;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #ffebee;
+    border-radius: 4px;
+    border-left: 4px solid #d32f2f;
+}
+
 @media (max-width:1250px){ 
     .mockup-image-placeholder{ max-width:500px; height:500px; } 
 }
@@ -222,7 +220,9 @@ body {
         <div class="product-carousel-wrapper">
             <div class="carousel-arrow left" id="arrowLeft">&#10094;</div>
             <div class="product-carousel-inner-container">
-                <div class="product-carousel" id="productCarousel"></div>
+                <div class="product-carousel" id="productCarousel">
+                    <!-- Products will be loaded here -->
+                </div>
             </div>
             <div class="carousel-arrow right" id="arrowRight">&#10095;</div>
         </div>
@@ -246,7 +246,6 @@ body {
         <p class="preview-area-header">Live Mockup Preview</p>
         <div class="mockup-image-placeholder" id="finalMockupPlaceholder">
             <div class="mockup-logo-overlay">CHOOSE TEMPLATE</div>
-            
         </div>
 
         <div class="input-group" style="width:100%; max-width:700px;">
@@ -261,6 +260,8 @@ body {
             </span>
         </button>
         
+        <div id="errorContainer"></div>
+        
         <p class="success-message-text" id="successMessage"><span style="font-size:1.5em;">&#10003;</span> Mockup successfully generated!</p>
         <a href="#" id="downloadBtn" class="download-btn" download="mockup_generated.png" style="max-width:700px;">
             <span style="font-size:1.2em;">&#11123;</span> Download Mockup
@@ -269,17 +270,20 @@ body {
 </div>
 
 <div id="lightboxOverlay"></div>
+
 <script>
+// Get the base URL dynamically
+const BASE_URL = window.location.origin;
+
 const productsData = [
-    { id: 'cup', name: 'Paper Cup', image_url: 'https://backend-gmini-545728844990.europe-west1.run.app/static/cup.png' },
-    { id: 'paper_bag', name: 'Paper Bag', image_url: 'https://backend-gmini-545728844990.europe-west1.run.app/static/Paper_Bag.webp' },
-    { id: 'paper_bowl', name: 'Paper Bowl', image_url: 'https://backend-gmini-545728844990.europe-west1.run.app/static/paper_bowl.jpg' },
-    { id: 'meal_box', name: 'Meal Box', image_url: 'https://backend-gmini-545728844990.europe-west1.run.app/static/meal_box.png' },
-    { id: 'wrapping_paper', name: 'Wrapping Paper', image_url: 'https://backend-gmini-545728844990.europe-west1.run.app/static/wrapping_paper.jpg' },
-    { id: 'paper_napkin', name: 'Paper Napkin', image_url: 'https://backend-gmini-545728844990.europe-west1.run.app/static/paper_napkin.jpg' }
+    { id: 'paper_cup', name: 'Paper Cup', image_url: `${BASE_URL}/static/Paper_Cup.jpeg` },
+    { id: 'paper_bag', name: 'Paper Bag', image_url: `${BASE_URL}/static/Paper_Bag.webp` },
+    { id: 'paper_bowl', name: 'Paper Bowl', image_url: `${BASE_URL}/static/paper_bowl.jpg` },
+    { id: 'meal_box', name: 'Meal Box', image_url: `${BASE_URL}/static/meal_box.png` },
+    { id: 'wrapping_paper', name: 'Wrapping Paper', image_url: `${BASE_URL}/static/wrapping_paper.jpg` },
+    { id: 'paper_napkin', name: 'Paper Napkin', image_url: `${BASE_URL}/static/paper_napkin.jpg` }
 ];
 
-// **UPDATED** List of individual colors (Hex codes)
 const colorsData = [
     { name: 'None', hex: 'transparent' }, 
     { name: 'Black', hex: '#000000' },
@@ -308,6 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const brandNameInput = document.getElementById('brandName');
     const colorPickerGrid = document.getElementById('colorPickerGrid');
     const progressPercentage = document.getElementById('progressPercentage');
+    const errorContainer = document.getElementById('errorContainer');
 
     let activeProductId = null;
     let uploadedLogoFile = null; 
@@ -315,7 +320,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let generatedMockupDataUrl = null;
     let selectedColorHex = 'transparent';
 
-    // --- Color Picker Rendering ---
+    function showError(message) {
+        errorContainer.innerHTML = `<div class="error-message">${message}</div>`;
+        setTimeout(() => {
+            errorContainer.innerHTML = '';
+        }, 5000);
+    }
+
     function renderColorPicker() {
         colorPickerGrid.innerHTML = '';
         colorsData.forEach(color => {
@@ -344,17 +355,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             colorOption.addEventListener('click', () => {
                 selectedColorHex = color.hex;
-                
                 document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('active'));
-                
                 if (color.hex !== 'transparent') {
                     colorOption.classList.add('active');
                 }
-                
                 successMessage.style.display = 'none';
                 downloadBtn.style.display = 'none';
                 generatedMockupDataUrl = null;
-                
                 checkGenerateButtonState();
             });
             
@@ -362,7 +369,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Check Generate Button State ---
     function checkGenerateButtonState() {
         const productSelected = activeProductId !== null && activeProductId !== "";
         const logoUploaded = !!uploadedLogoFile;
@@ -379,7 +385,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Product Selection ---
     function setActiveProduct(productId){
         document.querySelectorAll('.product-card').forEach(c=>c.classList.remove('active'));
         const activeCard = document.querySelector(`.product-card[data-product="${productId}"]`);
@@ -394,7 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const current = productsData.find(p=>p.id===activeProductId);
             if(current){
-                finalMockupPlaceholder.innerHTML=`<img src="${current.image_url}" style="max-width:100%; max-height:100%; object-fit:contain;" alt="${current.name} Preview">`;
+                finalMockupPlaceholder.innerHTML=`<img src="${current.image_url}" style="max-width:100%; max-height:100%; object-fit:contain;" alt="${current.name} Preview" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><rect fill=%22%23f0f0f0%22 width=%22200%22 height=%22200%22/><text x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22>${current.name}</text></svg>'">`;
             }
         } else {
             activeProductId = null;
@@ -408,18 +413,20 @@ document.addEventListener('DOMContentLoaded', () => {
         productCarousel.innerHTML='';
         productsData.forEach(p=>{
             const card = document.createElement('div');
-            card.classList.add('product-card'); card.dataset.product=p.id;
-            card.innerHTML=`<img src="${p.image_url}" class="product-real-image" alt="${p.name}"><span class="product-name">${p.name}</span>`;
+            card.classList.add('product-card'); 
+            card.dataset.product=p.id;
+            card.innerHTML=`<img src="${p.image_url}" class="product-real-image" alt="${p.name}" onerror="this.style.display='none'; this.parentElement.innerHTML+='<div style=\\'padding:20px;color:#999;\\'>${p.name}</div>'"><span class="product-name">${p.name}</span>`;
             card.addEventListener('click',()=>setActiveProduct(p.id));
             productCarousel.appendChild(card);
         });
+        
+        console.log('Products rendered:', productsData.length);
         setActiveProduct(null); 
     }
 
     arrowLeft.addEventListener('click',()=>productCarousel.scrollBy({left:-150,behavior:'smooth'}));
     arrowRight.addEventListener('click',()=>productCarousel.scrollBy({left:150,behavior:'smooth'}));
 
-    // --- File Upload Handling ---
     function resetLogoInput() {
         uploadedLogoFile = null;
         uploadedLogoMimeType = "image/png";
@@ -441,7 +448,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(e.target.files.length>0){
             const file = e.target.files[0];
             if (!validateFileExtension(file.name)) {
-                alert(`Invalid file type. Allowed formats: ${allowedExtensions.join(', ')}`);
+                showError(`Invalid file type. Allowed formats: ${allowedExtensions.join(', ')}`);
                 resetLogoInput();
                 return;
             }
@@ -462,7 +469,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(files.length>0){
             const file = files[0];
             if (!validateFileExtension(file.name)) {
-                alert(`Invalid file type. Allowed formats: ${allowedExtensions.join(', ')}`);
+                showError(`Invalid file type. Allowed formats: ${allowedExtensions.join(', ')}`);
                 return;
             }
             uploadedLogoFile = file;
@@ -475,7 +482,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     brandNameInput.addEventListener('input', checkGenerateButtonState);
 
-    // --- Utility Functions ---
     function startLoading(button) {
         button.classList.add('loading');
         button.disabled = true;
@@ -502,10 +508,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Mockup Generation Function ---
     async function generateMockupHandler() {
         if (!activeProductId) {
-            alert('Please select a product template first!');
+            showError('Please select a product template first!');
             return;
         }
 
@@ -516,12 +521,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedColorName = colorsData.find(c => c.hex === selectedColorHex)?.name || 'None';
 
         if (!uploadedLogoFile && !brandName) {
-            alert('Please upload a design/logo file OR enter a Brand Name.');
+            showError('Please upload a design/logo file OR enter a Brand Name.');
             return;
         }
         
         successMessage.style.display = 'none';
         downloadBtn.style.display = 'none';
+        errorContainer.innerHTML = '';
         generatedMockupDataUrl = null;
         startLoading(generateBtn);
         
@@ -549,7 +555,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 logoFilename = uploadedLogoFile.name;
             }
 
-            const response = await fetch('https://backend-gmini-545728844990.europe-west1.run.app/generate-mockup', {
+            console.log('Sending request to:', `${BASE_URL}/generate-mockup`);
+            
+            const response = await fetch(`${BASE_URL}/generate-mockup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -579,27 +587,30 @@ document.addEventListener('DOMContentLoaded', () => {
                     downloadBtn.href = generatedMockupDataUrl;
                     downloadBtn.download = `mockup_${activeProductId}.png`;
                 } else {
-                    alert('Backend Error: ' + (data.error || 'No image data returned.'));
+                    showError('Backend Error: ' + (data.error || 'No image data returned.'));
                 }
             }, 300); 
 
         } catch (err) {
-            console.error(err);
+            console.error('Generation error:', err);
             clearInterval(progressInterval);
             stopLoading(generateBtn);
-            finalMockupPlaceholder.innerHTML = '<p style="color:red;font-weight:500;">Generation failed. Please check the backend server logs.</p>';
-            alert('A network error occurred. Check if the server is running.');
+            showError(`Network error: ${err.message}. Please check if the backend server is running.`);
         }
     }
 
-    // --- EVENT LISTENERS ---
     generateBtn.addEventListener('click', generateMockupHandler);
-    lightboxOverlay.addEventListener('click', () => { lightboxOverlay.style.display = 'none'; lightboxOverlay.innerHTML = ''; });
+    lightboxOverlay.addEventListener('click', () => { 
+        lightboxOverlay.style.display = 'none'; 
+        lightboxOverlay.innerHTML = ''; 
+    });
 
     // Initial render
     renderAllProducts();
     renderColorPicker();
     checkGenerateButtonState();
+    
+    console.log('App initialized. Base URL:', BASE_URL);
 });
 </script>
 </body>
