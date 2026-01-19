@@ -15,7 +15,7 @@ CORS(app)
 
 # ---------------- Gemini API config ----------------
 API_KEY = os.environ.get("GEMINI_API_KEY") 
-API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key="
+API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key="
 
 if not API_KEY:
     print("FATAL ERROR: GEMINI_API_KEY environment variable not set. API calls will fail.")
